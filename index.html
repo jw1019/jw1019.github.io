@@ -1,9 +1,135 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>My Portfolio</title>
-  </head>
-  <body>
-    <h1>Hello, world — site is live!</h1>
-  </body>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>1019 — Jason Wu / Split Profile with Theme Toggle</title>
+<style>
+  :root{--bg:#11110f;--fg:#f4f2ed;--muted:rgba(244,242,237,.66);--body:rgba(244,242,237,.82);--line:rgba(244,242,237,.24);--portrait-bg:#dedbd6}
+  html[data-theme="light"]{--bg:#f1f0ec;--fg:#171715;--muted:rgba(23,23,21,.66);--body:rgba(23,23,21,.82);--line:rgba(23,23,21,.2);--portrait-bg:#dedbd6}
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%;background:var(--bg);color:var(--fg);font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif}
+  body{overflow:hidden;transition:background-color .35s ease,color .35s ease}
+  body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.07;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.88' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.45'/%3E%3C/svg%3E")}
+  a{color:inherit;text-decoration:none}
+  .page{position:relative;z-index:1;height:100svh;padding:28px 32px;display:grid;grid-template-rows:auto 1fr auto}
+  header{display:flex;justify-content:space-between;align-items:center}
+  .header-actions{display:flex;align-items:center;gap:22px}
+  .mark{font-size:12px;letter-spacing:.11em;text-transform:uppercase;font-weight:650}
+  nav{display:flex;gap:25px;font-size:13px;color:var(--muted)}
+  nav a:hover{color:var(--fg)}
+  .theme-toggle{display:inline-flex;align-items:center;gap:8px;border:0;background:none;color:var(--muted);padding:0;cursor:pointer;font-size:12px;letter-spacing:.03em}
+  .theme-toggle:hover{color:var(--fg)}
+  .toggle-track{position:relative;width:38px;height:20px;border:1px solid var(--line);border-radius:999px;transition:border-color .35s ease,background-color .35s ease}
+  .toggle-knob{position:absolute;top:3px;left:3px;width:12px;height:12px;border-radius:50%;background:var(--fg);transition:transform .3s ease,background-color .35s ease}
+  html[data-theme="light"] .toggle-knob{transform:translateX(18px)}
+  .theme-icon{width:14px;text-align:center;font-size:13px;line-height:1}
+  .page,.panel,.portrait-window,.work-link,.rule,.rule i{transition:background-color .35s ease,color .35s ease,border-color .35s ease}
+  .hero{align-self:center;display:grid;grid-template-columns:minmax(520px,1.08fr) minmax(460px,.92fr);gap:clamp(54px,6vw,96px);align-items:center;max-width:1460px;width:100%;margin:0 auto;padding:34px 0}
+  .portrait-window{position:relative;width:min(100%,610px);aspect-ratio:1/1.15;overflow:hidden;background:var(--portrait-bg);justify-self:end}
+  .portrait-window img{width:100%;height:100%;object-fit:cover;object-position:center 34%;display:block;transform:scale(1.01)}
+  .portrait-window:after{content:"";position:absolute;inset:0;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12);pointer-events:none}
+  .content{position:relative;min-height:500px;display:flex;align-items:center}
+  .panel{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;opacity:0;transform:translateY(10px);pointer-events:none;transition:opacity .45s ease,transform .45s ease}
+  .panel.active{opacity:1;transform:translateY(0);pointer-events:auto}
+  .eyebrow{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:24px}
+  h1{font-size:clamp(44px,4.65vw,72px);line-height:1.01;letter-spacing:-.05em;font-weight:520;max-width:680px;margin:0 0 26px}
+  .body{font-size:clamp(17px,1.28vw,21px);line-height:1.52;color:var(--body);max-width:620px;margin:0}
+  .work-links{display:grid;grid-template-columns:1fr 1fr;gap:0;margin-top:14px;max-width:680px;border-top:1px solid var(--line)}
+  .work-link{display:flex;justify-content:space-between;gap:20px;padding:18px 0;border-bottom:1px solid var(--line);font-size:clamp(18px,1.5vw,22px)}
+  .work-link:nth-child(odd){padding-right:26px}.work-link:nth-child(even){padding-left:26px;border-left:1px solid var(--line)}
+  .work-link > span:first-child{display:flex;flex-direction:column;gap:6px}.work-link strong{font-size:inherit;font-weight:500;line-height:1.15}.work-link small{font-size:12px;line-height:1.35;color:var(--muted);font-weight:400}.work-link > span:last-child{color:var(--muted);transition:transform .2s ease}.work-link:hover > span:last-child{transform:translateX(4px);color:var(--fg)}
+  footer{display:flex;justify-content:space-between;align-items:flex-end;gap:24px}
+  .section-label{font-size:12px;line-height:1.5;color:var(--muted)}
+  .section-label strong{display:block;color:var(--fg);font-weight:500;margin-bottom:2px}
+  .controls{display:flex;align-items:center;gap:14px}
+  button{appearance:none;border:0;background:none;color:var(--fg);font:inherit;padding:7px;cursor:pointer;opacity:.72}button:hover{opacity:1}
+  .count{font-size:11px;letter-spacing:.08em;min-width:46px;text-align:center}
+  .rule{width:98px;height:1px;background:var(--line);position:relative;overflow:hidden}.rule i{display:block;width:33.333%;height:100%;background:var(--fg);transition:transform .4s ease}
+  @media(max-width:980px){
+    body{overflow:auto}.page{height:auto;min-height:100svh;padding:22px;grid-template-rows:auto auto auto}
+    nav{gap:15px}.hero{grid-template-columns:1fr;gap:32px;padding:55px 0 40px}.portrait-window{justify-self:start;width:min(82vw,500px);aspect-ratio:4/5}.content{min-height:460px}.panel{position:absolute}h1{font-size:clamp(38px,10vw,60px)}
+    footer{padding-top:12px}.work-links{grid-template-columns:1fr}.work-link:nth-child(odd),.work-link:nth-child(even){padding:17px 0;border-left:0}.rule{display:none}
+  }
+  @media(max-width:540px){nav a:nth-child(2){display:none}.portrait-window{width:100%}.content{min-height:500px}.body{font-size:17px}}
+</style>
+</head>
+<body>
+<main class="page">
+  <header>
+    <div class="mark">1019 / Jason Wu</div>
+    <div class="header-actions"><nav><a href="mailto:jason@1019.co">Email</a><a href="#">LinkedIn</a><a href="#works" id="worksNav">Work</a></nav><button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode" aria-pressed="false"><span class="theme-icon" id="themeIcon">☾</span><span class="toggle-track" aria-hidden="true"><span class="toggle-knob"></span></span></button></div>
+  </header>
+
+  <section class="hero">
+    <div class="content">
+      <article class="panel active" data-label="Introduction" data-meta="About Jason">
+        <div class="eyebrow">Introduction</div>
+        <h1>Independent product designer and advisor.</h1>
+        <p class="body">I help teams turn complex ideas into clear, useful products. I’m based in the San Francisco Bay Area and work with startups and established teams across product strategy, interaction design, and design leadership.</p>
+      </article>
+
+      <article class="panel" data-label="Experience" data-meta="Work background">
+        <div class="eyebrow">Experience</div>
+        <h1>More than twenty years designing products and building teams.</h1>
+        <p class="body">Previously Head of Design at Shippo and Product Design Director at Zendesk. Today I partner directly with founders and product teams, helping shape new products, simplify complex workflows, and turn early concepts into experiences people can use.</p>
+      </article>
+
+      <article class="panel" id="works" data-label="Selected work" data-meta="Browse by category">
+        <div class="eyebrow">Selected work</div>
+        <h1>Design work across four areas.</h1>
+        <div class="work-links">
+          <a class="work-link" href="#"><span><strong>Fintech &amp; Payments</strong><small>Payments, pricing and monetization</small></span><span>↗</span></a>
+          <a class="work-link" href="#"><span><strong>Enterprise Systems</strong><small>Complex workflows and B2B platforms</small></span><span>↗</span></a>
+          <a class="work-link" href="#"><span><strong>Consumer Products</strong><small>Content, commerce and everyday tools</small></span><span>↗</span></a>
+          <a class="work-link" href="#"><span><strong>AI &amp; Community</strong><small>Conversational, social and collaborative products</small></span><span>↗</span></a>
+        </div>
+      </article>
+    </div>
+    <figure class="portrait-window"><img src="./jason-portrait.jpg" alt="Portrait of Jason Wu" /></figure>
+  </section>
+
+  <footer>
+    <div class="section-label"><strong id="label">Introduction</strong><span id="meta">About Jason</span></div>
+    <div class="controls"><button id="prev" aria-label="Previous section">←</button><span class="count" id="count">01 / 03</span><button id="next" aria-label="Next section">→</button><span class="rule"><i id="indicator"></i></span></div>
+  </footer>
+</main>
+<script>
+const root=document.documentElement;
+const themeToggle=document.getElementById('themeToggle');
+const themeIcon=document.getElementById('themeIcon');
+const savedTheme=localStorage.getItem('1019-theme');
+const initialTheme=savedTheme || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+function applyTheme(theme){
+  root.dataset.theme=theme;
+  const isLight=theme==='light';
+  themeToggle.setAttribute('aria-pressed',String(isLight));
+  themeToggle.setAttribute('aria-label',isLight?'Switch to dark mode':'Switch to light mode');
+  themeIcon.textContent=isLight?'☀':'☾';
+}
+applyTheme(initialTheme);
+themeToggle.addEventListener('click',()=>{
+  const next=root.dataset.theme==='light'?'dark':'light';
+  applyTheme(next);
+  localStorage.setItem('1019-theme',next);
+});
+
+const panels=[...document.querySelectorAll('.panel')];
+const label=document.getElementById('label'),meta=document.getElementById('meta'),count=document.getElementById('count'),indicator=document.getElementById('indicator');
+let current=0;
+function show(index){
+  current=(index+panels.length)%panels.length;
+  panels.forEach((panel,i)=>panel.classList.toggle('active',i===current));
+  label.textContent=panels[current].dataset.label;
+  meta.textContent=panels[current].dataset.meta;
+  count.textContent=String(current+1).padStart(2,'0')+' / '+String(panels.length).padStart(2,'0');
+  indicator.style.transform=`translateX(${current*100}%)`;
+}
+document.getElementById('prev').onclick=()=>show(current-1);
+document.getElementById('next').onclick=()=>show(current+1);
+document.getElementById('worksNav').onclick=e=>{e.preventDefault();show(2)};
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')show(current+1);if(e.key==='ArrowLeft')show(current-1)});
+let touchX=0;document.addEventListener('touchstart',e=>touchX=e.changedTouches[0].screenX,{passive:true});document.addEventListener('touchend',e=>{const d=e.changedTouches[0].screenX-touchX;if(Math.abs(d)>45)show(current+(d<0?1:-1))},{passive:true});
+</script>
+</body>
 </html>
